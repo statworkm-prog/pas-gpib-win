@@ -3,7 +3,12 @@ Program FPGACurrentMeasurement;
 {$mode objfpc}{$H+}
 
 Uses
-  Classes, SysUtils, LinuxGPIB, OoGPIB, DevComGPIB, RemoteInstrument, Keithley2010, LeCroyWaveJet, RohdeSchwarzFSEB, Serial, Keyboard, Math;
+  {$IFDEF WINDOWS}
+  Crt,    WindowsGPIB,
+  {$ELSE}
+  LinuxGPIB,
+  {$ENDIF}
+  OoGPIB, DevComGPIB, Classes, SysUtils, RemoteInstrument, Keithley2010, LeCroyWaveJet, RohdeSchwarzFSEB, Serial, Keyboard, Math;
 
 Type DoubleArray = Array of Double;
 
@@ -104,7 +109,12 @@ Begin
     { termination condition }
     if KeyPressed then
       Begin
-        RawReadKey;  // eat up the key
+        // eat up the key
+{$IFDEF WINDOWS}
+        ReadKey;
+{$ELSE}
+        RawReadKey;
+{$ENDIF}
         if FKey then
           Done := true
         else
@@ -203,7 +213,11 @@ Begin
   For I := 0 to Length(FMeasurements)-1 do
      Begin
        Write('Starting "',FLabels[I],'": press key when ready');
-       RawReadKey;
+{$IFDEF WINDOWS}
+        ReadKey;
+{$ELSE}
+        RawReadKey;
+{$ENDIF}
        WriteLn;
        FMeasurements[I].Measure;
      End;

@@ -11,7 +11,12 @@ Unit OoGPIB;
 Interface
 
 Uses
-  Classes, SysUtils, LinuxGPIB;
+  Classes, SysUtils,
+{$IFDEF WINDOWS}
+  WindowsGPIB;
+{$ELSE}
+  LinuxGPIB;
+{$ENDIF}
 
 Type
   EGPIB = class(Exception);
@@ -143,11 +148,36 @@ Type
 
 Const
   ReadBufferIncrement = 10;//24*200;
-
+{$IFDEF WINDOWS}
+    var CtrlCPressed: Boolean = False;
+{$ENDIF}
 Implementation
-Uses PasGpibUtils,BaseUnix;
+Uses PasGpibUtils,
+{$IFDEF WINDOWS}
+    Windows;
+{$ELSE}
+    BaseUnix;
+{$ENDIF}
+
+
 
 { TGPIB }
+
+
+//Adding function on Windows to check for Ctrl_C to interrupt 'Function TGPIB.Read'
+{$IFDEF WINDOWS}
+function ConsoleCtrlHandler(dwCtrlType: DWORD): BOOL; stdcall;
+begin
+  if dwCtrlType = CTRL_C_EVENT then
+  begin
+    CtrlCPressed := True;
+    Result := True;
+  end
+  else
+    Result := False;
+end;
+{$ENDIF}
+
 
 Constructor TGPIB.Create(ADeviceName: String);
 Begin
@@ -183,7 +213,11 @@ Begin
     { if not complete: increase buffer size }
     if Status and ENDS = 0 then
       SetLength(Result,Length(Result)+ReadBufferIncrement);
+{$IFDEF WINDOWS}
+  Until ((Status and ENDS) <> 0) or CtrlCPressed;
+{$ELSE}
   Until ((Status and ENDS) <> 0) or SigPending(SIGINT);
+{$ENDIF}
   SetLength(Result,Pos-1);
 {$ELSE}
   // use ibrdf() instead of ibrd() since the R&S FSEB seems not to like
@@ -242,6 +276,11 @@ Begin
   if (Status and CMPL = 0) or (Status and (ERR or TIMO) <> 0) then  // TODO: what is with RQS?
     raise EGPIB.CreateFmt('Error: Status = $%04X, Error = %s',[Status,ErrorString(iberr)]);
 End;
+
+{$IFDEF WINDOWS}
+initialization
+  SetConsoleCtrlHandler(@ConsoleCtrlHandler, True);
+{$ENDIF}
 
 End.
 

@@ -32,7 +32,13 @@ Type
   End;
 
 Implementation
-Uses LinuxGPIB;
+Uses
+  {$IFDEF WINDOWS}
+    WindowsGPIB;
+  {$ELSE}
+    LinuxGPIB;
+  {$ENDIF}
+
 
 { TGPIBCommunicator }
 
