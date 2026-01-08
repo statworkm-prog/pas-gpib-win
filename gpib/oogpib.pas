@@ -11,13 +11,11 @@ Unit OoGPIB;
 Interface
 
 Uses
-  Classes, SysUtils,
-{$IFDEF WINDOWS}
-  WindowsGPIB;
-{$ELSE}
-  LinuxGPIB;
+  Classes, SysUtils
+{$IFNDEF WINDOWS}
+  , LinuxGPIB;
 {$ENDIF}
-
+  ;
 Type
   EGPIB = class(Exception);
 

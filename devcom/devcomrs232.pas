@@ -51,14 +51,14 @@ Uses
 
   {$IFDEF WINDOWS}
   Windows, Winsock, PasGpibUtils;
-
-var
-  WSAData: TWSAData;
-{ TRS232Communicator }
-  {$ELSE}
+  //Winsock variable
+  var
+   WSAData: TWSAData;
+    {$ELSE}
   BaseUnix, Errors, PasGpibUtils;
   {$ENDIF}
 
+{ TRS232Communicator }
 //Helper function to enable SelectRead on windows
 {$IFDEF WINDOWS}
  function SelectRead(Sock: LongInt; TimeoutMS: Cardinal): LongInt;

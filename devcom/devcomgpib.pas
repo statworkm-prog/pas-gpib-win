@@ -8,7 +8,7 @@ Unit DevComGPIB;
 {$interfaces corba}
 
 Interface
-
+{$IFNDEF WINDOWS}
 Uses
   Classes, SysUtils,
   DevCom, OoGPIB;
@@ -30,14 +30,13 @@ Type
     Procedure SetTimeout(ATimeout:LongInt);   // in us
     Function  GetTimeout:LongInt;   // in us
   End;
+{$ENDIF}
 
 Implementation
+{$IFNDEF WINDOWS}
 Uses
-  {$IFDEF WINDOWS}
-    WindowsGPIB;
-  {$ELSE}
-    LinuxGPIB;
-  {$ENDIF}
+  LinuxGPIB;
+
 
 
 { TGPIBCommunicator }
@@ -99,6 +98,8 @@ Function TGPIBCommunicator.GetTimeout : LongInt;
 Begin
   Result := FTimeout;
 End;
+
+{$ENDIF}
 
 End.
 

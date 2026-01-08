@@ -4,11 +4,11 @@ Program FPGACurrentMeasurement;
 
 Uses
   {$IFDEF WINDOWS}
-  Crt,    WindowsGPIB,
+  Crt,
   {$ELSE}
-  LinuxGPIB,
+  LinuxGPIB,OoGPIB,DevComGPIB,
   {$ENDIF}
-  OoGPIB, DevComGPIB, Classes, SysUtils, RemoteInstrument, Keithley2010, LeCroyWaveJet, RohdeSchwarzFSEB, Serial, Keyboard, Math;
+   Classes, SysUtils, RemoteInstrument, Keithley2010, LeCroyWaveJet, RohdeSchwarzFSEB, Serial, Keyboard, Math;
 
 Type DoubleArray = Array of Double;
 
@@ -244,11 +244,14 @@ Begin
   Close(T);
 End;
 
+{$IFNDEF WINDOWS}
 Var DC    : TGPIBCommunicator {TRS232Communicator} ;
     K2010 : TKeithley2010;
     M     : TMeasureMatrixSetup;
     SaveFileName : String;
+{$ENDIF}
 Begin
+{$IFNDEF WINDOWS}
   { use command line parameter for a file name }
   SaveFileName := 'measurements.csv';
   if ParamCount = 1 then
@@ -275,5 +278,7 @@ Begin
   M.Free;
   K2010.Free;
   DC.Free;
+{$ENDIF}
+
 End.
 

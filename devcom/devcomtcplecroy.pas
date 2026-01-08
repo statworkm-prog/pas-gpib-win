@@ -42,7 +42,17 @@ Type
   End;
 
 Implementation
-Uses Errors,CTypes,BaseUnix,Sockets,PasGpibUtils;
+Uses
+{$IFDEF WINDOWS}
+  Windows, Winsock,
+{$ELSE}
+  Errors, BaseUnix,
+{$ENDIF}
+  CTypes,Sockets,PasGpibUtils;
+
+//Winsock variable
+var
+  WSAData: TWSAData;
 
 { TTCPLeCroyCommunicator }
 
@@ -61,6 +71,23 @@ Type
     Reserved : Array[0..2] of Byte;
     Length   : CInt32;
   End;
+
+  //Helper function to enable SelectRead on windows
+{$IFDEF WINDOWS}
+   function SelectRead(Sock: LongInt; TimeoutMS: Cardinal): LongInt;
+   var
+     FDS: TFDSet;
+     TV: TTimeVal;
+   begin
+     FD_ZERO(FDS);
+     FD_SET(Sock, FDS);
+
+     TV.tv_sec  := TimeoutMS div 1000;
+     TV.tv_usec := (TimeoutMS mod 1000) * 1000;
+     // Winsock requires nfds = ignored, so pass 0
+     Result := WinSock.select(0, @FDS, nil, nil, @TV)
+    end;
+{$ENDIF}
 
 Constructor TTCPLeCroyCommunicator.Create(AHost: String; APort: Word);
 Begin
@@ -93,13 +120,21 @@ Begin
   if Waiting = 0 then
     raise Exception.Create('Communication timeout for TCP/IP stream')  // no data -> timeout
   else if Waiting < 0 then
+{$IFDEF WINDOWS}
+    raise Exception.Create('Error while reading from TCP/IP stream: ' + 'Winsock error ' + IntToStr(GetLastError));
+{$ELSE}
     raise Exception.Create('Error while reading from TCP/IP stream: '+StrError(FpGetErrno));
+{$ENDIF}
   Pos := 0;
   repeat
     // receive header
     Len := FSocket.Read(Header,SizeOf(Header));
     if Len <> SizeOf(Header) then
+{$IFDEF WINDOWS}
+      raise Exception.Create('Error receiving header: ' + 'Winsock error ' + IntToStr(GetLastError));
+{$ELSE}
       raise Exception.Create('Error receiving header: '+StrError(FpGetErrno));
+{$ENDIF}
     Header.Length := NToHl(Header.Length);
     if Header.Length < 0 then Exit;
     // receive data
@@ -116,6 +151,17 @@ Begin
   Send(St);
   Result := Receive;
 End;
+
+{$IFDEF WINDOWS}
+//winsock requires initialisation
+initialization
+  if WSAStartup($0202, WSAData) <> 0 then
+    raise Exception.Create('WinSock initialization failed.');
+
+
+finalization
+  WSACleanup;
+{$ENDIF}
 
 End.
 

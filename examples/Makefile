@@ -1,6 +1,11 @@
 
 FPC = fpc
-FPOPTS = -Fu../base -Fu../devcom -Fu../usb -Fu../pas-libusb/src -Fu../gpib -Fu../instruments -Fu../instruments/keithley -Fu../instruments/lecroy -Fu../instruments/rohdeschwarz -Fu../instruments/agilent
+FPOPTS = -Fu../base -Fu../devcom -Fu../usb -Fu../pas-libusb/src -Fu../instruments -Fu../instruments/keithley -Fu../instruments/lecroy -Fu../instruments/rohdeschwarz -Fu../instruments/agilent
+ifeq ($(OS), Windows_NT)
+	FPC_OPTS += -Fu.. -Px86_64 -Twin64
+else 
+	FPC_OPTS += -Fu../gpib
+endif
 
 PROGS = fpgacurrentmeasurement testkeithley2010 testlecroywavejet3xx testrohdeschwarzfse testusbtmc testagilent34410a testagilentmsox3000a agilentmsox3000a-serial serialparse agilentmsox3000a-screenshot
 

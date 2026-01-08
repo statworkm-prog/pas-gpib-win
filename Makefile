@@ -1,7 +1,9 @@
-DIRS = base gpib usb devcom instruments examples
+DIRS = base usb devcom instruments examples
 FPCFLAGS = ""
 ifeq ($(OS), Windows_NT)
 	FPCFLAGS += -P x86_64 -T win64 -Fu"C:/FPC/3.2.2/units/x86_64-win64"
+else 
+	DIRS += gpib
 endif
 
 all:
