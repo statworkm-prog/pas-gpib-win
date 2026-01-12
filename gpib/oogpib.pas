@@ -13,7 +13,7 @@ Interface
 Uses
   Classes, SysUtils
 {$IFNDEF WINDOWS}
-  , LinuxGPIB;
+  , LinuxGPIB
 {$ENDIF}
   ;
 Type
