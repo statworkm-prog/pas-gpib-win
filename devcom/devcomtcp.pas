@@ -57,6 +57,7 @@ Uses
   Errors, BaseUnix;
 {$ELSE}
   Windows;
+{$ENDIF}
 
 { TTCPCommunicator }
 

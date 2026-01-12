@@ -50,10 +50,6 @@ Uses
 {$ENDIF}
   CTypes,Sockets,PasGpibUtils;
 
-//Winsock variable
-var
-  WSAData: TWSAData;
-
 { TTCPLeCroyCommunicator }
 
 Const

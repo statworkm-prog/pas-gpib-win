@@ -39,6 +39,10 @@ Function SigPending(SigNo:Integer) : Boolean;
 Function SelectRead(AHandle:Integer;ATimeout:Integer { in us }) : Integer;
 {$ENDIF}
 
+{$IFDEF WINDOWS}
+Function SelectRead(Sock: LongInt; TimeoutMS: Cardinal): LongInt;
+{$ENDIF}
+
 Function WaitTimeout(Initial,Period,Max:Integer;Checker:TWaitCheckerFunc;Data:Pointer) : Integer;
 
 Function GetFileSize(AFilename : String) : Int64;
