@@ -84,10 +84,15 @@ Function FloatToStrSI(Value:Double;Const FormatSettings:TFormatSettings;Unicode:
 
 Implementation
 Uses
-{$IFDEF UNIX}
-  BaseUnix,
+  StrUtils, Math, DateUtils,
+{$IFDEF WINDOWS}
+  Windows, Winsock;
+  //Winsock variable
+var
+  WSAData: TWSAData;
+{$ELSE}
+  BaseUnix;
 {$ENDIF}
-  StrUtils, Math, DateUtils;
 
 Function SplitStr(Delimiter:String;St:String) : TDynStringArray;
 Var S,E : Integer;
@@ -216,6 +221,23 @@ Begin
     Exit('Invalid ('+IntToStr(I)+')');
   Result := S[I];
 End;
+
+//Helper function to enable SelectRead on windows
+{$IFDEF WINDOWS}
+ function SelectRead(Sock: LongInt; TimeoutMS: Cardinal): LongInt;
+ var
+   FDS: TFDSet;
+   TV: TTimeVal;
+ begin
+   FD_ZERO(FDS);
+   FD_SET(Sock, FDS);
+
+   TV.tv_sec  := TimeoutMS div 1000;
+   TV.tv_usec := (TimeoutMS mod 1000) * 1000;
+   // Winsock requires nfds = ignored, so pass 0
+   Result := WinSock.select(0, @FDS, nil, nil, @TV)
+  end;
+{$ENDIF}
 
 {$IFDEF UNIX}
 Function SigPending(SigNo:Integer) : Boolean;
@@ -387,6 +409,17 @@ Begin
   if Unicode then Result := Result + CSIPrefixSymbol     [SIPrefix]
   else            Result := Result + CSIPrefixSymbolAscii[SIPrefix];
 End;
+
+{$IFDEF WINDOWS}
+//winsock requires initialisation
+initialization
+  if WSAStartup($0202, WSAData) <> 0 then
+    raise Exception.Create('WinSock initialization failed.');
+
+
+finalization
+  WSACleanup;
+{$ENDIF}
 
 End.
 

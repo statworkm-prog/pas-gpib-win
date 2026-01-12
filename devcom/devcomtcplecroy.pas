@@ -44,7 +44,7 @@ Type
 Implementation
 Uses
 {$IFDEF WINDOWS}
-  Windows, Winsock,
+  Windows,
 {$ELSE}
   Errors, BaseUnix,
 {$ENDIF}
@@ -71,23 +71,6 @@ Type
     Reserved : Array[0..2] of Byte;
     Length   : CInt32;
   End;
-
-  //Helper function to enable SelectRead on windows
-{$IFDEF WINDOWS}
-   function SelectRead(Sock: LongInt; TimeoutMS: Cardinal): LongInt;
-   var
-     FDS: TFDSet;
-     TV: TTimeVal;
-   begin
-     FD_ZERO(FDS);
-     FD_SET(Sock, FDS);
-
-     TV.tv_sec  := TimeoutMS div 1000;
-     TV.tv_usec := (TimeoutMS mod 1000) * 1000;
-     // Winsock requires nfds = ignored, so pass 0
-     Result := WinSock.select(0, @FDS, nil, nil, @TV)
-    end;
-{$ENDIF}
 
 Constructor TTCPLeCroyCommunicator.Create(AHost: String; APort: Word);
 Begin
@@ -151,17 +134,6 @@ Begin
   Send(St);
   Result := Receive;
 End;
-
-{$IFDEF WINDOWS}
-//winsock requires initialisation
-initialization
-  if WSAStartup($0202, WSAData) <> 0 then
-    raise Exception.Create('WinSock initialization failed.');
-
-
-finalization
-  WSACleanup;
-{$ENDIF}
 
 End.
 

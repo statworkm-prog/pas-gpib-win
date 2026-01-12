@@ -56,25 +56,7 @@ Uses
  {$IFNDEF WINDOWS}
   Errors, BaseUnix;
 {$ELSE}
-  Windows, Winsock;
-
-var
-  WSAData: TWSAData;
-
-//windows-specific SelectRead-implementation
-function SelectRead(Sock: TSocket; TimeoutMS: Cardinal): LongInt;
-var
-  FDS: TFDSet;
-  TV: TTimeVal;
-begin
-  FD_ZERO(FDS);
-  FD_SET(Sock, FDS);
-  TV.tv_sec := TimeoutMS div 1000;
-  TV.tv_usec := (TimeoutMS mod 1000) * 1000;
-  // On Windows, nfds is ignored
-  Result := WinSock.select(Sock+1, @FDS, nil, nil, @TV);
-end;
-{$ENDIF}
+  Windows;
 
 { TTCPCommunicator }
 
@@ -117,13 +99,11 @@ Begin
       raise Exception.Create('Communication timeout for TCP/IP stream')  // no data -> timeout
     else if Waiting < 0 then
 {$IFDEF UNIX}
-      raise Exception.Create('Error while reading from TCP/IP stream: ' +
-                         StrError(FpGetErrno));
+      raise Exception.Create('Error while reading from TCP/IP stream: ' + StrError(FpGetErrno));
 {$ENDIF}
 
 {$IFDEF WINDOWS}
-      raise Exception.Create('Error while reading from TCP/IP stream: ' +
-                         'Winsock error ' + IntToStr(WSAGetLastError));
+      raise Exception.Create('Error while reading from TCP/IP stream: ' + 'Winsock error ' + IntToStr(WSAGetLastError));
 {$ENDIF}
     SetLength(Result,Pos-1+1024);
     Len := FSocket.Read(Result[Pos],1024);
@@ -154,17 +134,6 @@ Function TTCPCommunicator.GetTimeout : LongInt;
 Begin
   Result := FTimeout;
 End;
-
-{$IFDEF WINDOWS}
-//winsock requires initialisation
-initialization
-  if WSAStartup($0202, WSAData) <> 0 then
-    raise Exception.Create('WinSock initialization failed.');
-
-
-finalization
-  WSACleanup;
-{$ENDIF}
 
 End.
 
