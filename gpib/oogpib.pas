@@ -157,10 +157,7 @@ Uses PasGpibUtils,
     BaseUnix;
 {$ENDIF}
 
-
-
 { TGPIB }
-
 
 //Adding function on Windows to check for Ctrl_C to interrupt 'Function TGPIB.Read'
 {$IFDEF WINDOWS}
@@ -175,7 +172,6 @@ begin
     Result := False;
 end;
 {$ENDIF}
-
 
 Constructor TGPIB.Create(ADeviceName: String);
 Begin

@@ -50,7 +50,6 @@ Type
 
 Implementation
 
-
 Uses
  PasGpibUtils,
  {$IFNDEF WINDOWS}

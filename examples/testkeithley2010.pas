@@ -4,12 +4,7 @@ Program TestKeithley2010;
 {$mode objfpc}{$H+}
 {$IFNDEF WINDOWS}
 Uses
-  Classes, SysUtils,
-
-  LinuxGPIB, OoGPIB,
-
-  DevComGPIB, DevComRS232, Keithley2010, Serial, Keyboard;
-
+  Classes, SysUtils,LinuxGPIB, OoGPIB, DevComGPIB, DevComRS232, Keithley2010, Serial, Keyboard;
 
 Var Handle : Integer;
     Status : Integer;
@@ -111,5 +106,4 @@ WriteLn('Status = ',Status,', cnt = ',ibcnt,', cntl = ',ibcntl,' Buffer = ',Buff
 
 {$ENDIF}
 End.
-
 
