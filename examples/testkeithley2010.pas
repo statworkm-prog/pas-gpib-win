@@ -1,10 +1,11 @@
-
 Program TestKeithley2010;
 
-{$mode objfpc}{$H+}
 {$IFNDEF WINDOWS}
+
+{$mode objfpc}{$H+}
+
 Uses
-  Classes, SysUtils,LinuxGPIB, OoGPIB, DevComGPIB, DevComRS232, Keithley2010, Serial, Keyboard;
+  Classes, SysUtils, LinuxGPIB, OoGPIB, DevComGPIB, DevComRS232, Keithley2010, Serial, Keyboard;
 
 Var Handle : Integer;
     Status : Integer;
@@ -14,8 +15,11 @@ Var Handle : Integer;
     DCG   : TGPIBCommunicator;
     DCS   : TRS232Communicator;
     K2010 : TKeithley2010;
+
 {$ENDIF}
+
 Begin
+
 {$IFNDEF WINDOWS}
 
   DCG := TGPIBCommunicator.Create('2010');
@@ -105,5 +109,5 @@ WriteLn('Status = ',Status,', cnt = ',ibcnt,', cntl = ',ibcntl,' Buffer = ',Buff
 WriteLn('Status = ',Status,', cnt = ',ibcnt,', cntl = ',ibcntl,' Buffer = ',Buffer);
 
 {$ENDIF}
-End.
 
+End.

@@ -1,4 +1,16 @@
+#ThomaS, 130126: to use the OS and ARCH variables in MinGW we need to set
+#                them up manually first as they wont get setup automatically... 
+#$(info OS: $(OS) ARCH: $(ARCH))
+UNAME_S := $(shell uname -s)
+# e.g. returns "MINGW64_NT-10.0-26200"
+UNAME_LIST := $(subst _, ,$(UNAME_S))
+OS_PREFIX := $(word 1,$(UNAME_LIST))
+ifeq ($(OS_PREFIX), MINGW64)
+  export OS= Windows_NT
+  export ARCH = x86_64
+endif
 
+#fpc options
 FPC = fpc
 FPOPTS = -Fu../base -Fu../devcom -Fu../usb -Fu../pas-libusb/src -Fu../instruments -Fu../instruments/keithley -Fu../instruments/lecroy -Fu../instruments/rohdeschwarz -Fu../instruments/agilent
 ifeq ($(OS), Windows_NT)
@@ -7,7 +19,12 @@ else
     FPC_OPTS += -Fu../gpib
 endif
 
-PROGS = fpgacurrentmeasurement testkeithley2010 testlecroywavejet3xx testrohdeschwarzfse testusbtmc testagilent34410a testagilentmsox3000a agilentmsox3000a-serial serialparse agilentmsox3000a-screenshot
+#programs
+PROGS = fpgacurrentmeasurement testlecroywavejet3xx testusbtmc testagilent34410a testagilentmsox3000a agilentmsox3000a-serial serialparse agilentmsox3000a-screenshot
+
+ifeq ($(OS), Windows_NT)
+    PROGS += testkeithley2010 testrohdeschwarzfse
+endif
 
 all: $(PROGS)
 

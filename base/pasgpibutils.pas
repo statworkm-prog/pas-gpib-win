@@ -270,13 +270,13 @@ End;
  * taken from https://tips.delphidabbler.com/tips/166
  *)
 Function GetFileSize(AFilename : String) : Int64;
-Var SR : TSearchRec;
+Var SR : SysUtils.TSearchRec;
 begin
-  if FindFirst(AFilename, faAnyFile, SR) = 0 then
+  if SysUtils.FindFirst(AFilename, faAnyFile, SR) = 0 then
     Result := SR.Size
   else
     Result := -1;
-  FindClose(SR);
+  SysUtils.FindClose(SR);
 End;
 
 Procedure WriteData(Filename : String; Data : TDynByteArray);

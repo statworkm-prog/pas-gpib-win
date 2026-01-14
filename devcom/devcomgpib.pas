@@ -1,5 +1,7 @@
 Unit DevComGPIB;
 
+{$IFNDEF WINDOWS}
+
 {$mode objfpc}{$H+}
 
 // use interfaces without IUnknown as ancestor, so they don' have reference
@@ -9,10 +11,8 @@ Unit DevComGPIB;
 
 Interface
 
-{$IFNDEF WINDOWS}
 Uses
-  Classes, SysUtils,
-  DevCom, OoGPIB;
+  Classes, SysUtils, DevCom, OoGPIB;
 
 Type
 
@@ -36,7 +36,8 @@ Type
 
 Implementation
 
-{$IFNDEF WINDOWS}
+  {$IFNDEF WINDOWS}
+
 Uses LinuxGPIB;
 
 { TGPIBCommunicator }
@@ -99,7 +100,6 @@ Begin
   Result := FTimeout;
 End;
 
-{$ENDIF}
-
 End.
 
+{$ENDIF}

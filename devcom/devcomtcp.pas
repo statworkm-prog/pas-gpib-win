@@ -55,7 +55,7 @@ Uses
  {$IFNDEF WINDOWS}
   Errors, BaseUnix;
 {$ELSE}
-  Windows;
+  Windows, Winsock;
 {$ENDIF}
 
 { TTCPCommunicator }
@@ -98,12 +98,10 @@ Begin
     else if (Waiting = 0) and (FTimeout <> 0) then
       raise Exception.Create('Communication timeout for TCP/IP stream')  // no data -> timeout
     else if Waiting < 0 then
-{$IFDEF UNIX}
-      raise Exception.Create('Error while reading from TCP/IP stream: ' + StrError(FpGetErrno));
-{$ENDIF}
-
 {$IFDEF WINDOWS}
       raise Exception.Create('Error while reading from TCP/IP stream: ' + 'Winsock error ' + IntToStr(WSAGetLastError));
+{$ELSE}
+      raise Exception.Create('Error while reading from TCP/IP stream: ' + StrError(FpGetErrno));
 {$ENDIF}
     SetLength(Result,Pos-1+1024);
     Len := FSocket.Read(Result[Pos],1024);

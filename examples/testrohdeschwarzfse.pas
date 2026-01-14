@@ -1,8 +1,9 @@
 Program TestRohdeSchwarzFSE;
 
+{$IFNDEF WINDOWS}
+
 {$mode objfpc}{$H+}
 
-{$IFNDEF WINDOWS}
 Uses
   Classes, SysUtils, DevComGPIB, RohdeSchwarzFSEB;
 
@@ -10,10 +11,13 @@ Var DC    : TGPIBCommunicator;
     FSEB  : TRohdeSchwarzFSEB;
     St    : String;
     F     : Text;
+
 {$ENDIF}
 
 Begin
+
 {$IFNDEF WINDOWS}
+
   { device communicator }
   DC := TGPIBCommunicator.Create('FSEB');
   DC.SetTimeout(5000000{us});
@@ -30,4 +34,3 @@ Begin
 {$ENDIF}
 
 End.
-
