@@ -12,7 +12,8 @@ Unit DevComGPIB;
 Interface
 
 Uses
-  Classes, SysUtils, DevCom, OoGPIB;
+  Classes, SysUtils,
+  DevCom, OoGPIB;
 
 Type
 
@@ -36,7 +37,7 @@ Type
 
 Implementation
 
-  {$IFNDEF WINDOWS}
+{$IFNDEF WINDOWS}
 
 Uses LinuxGPIB;
 

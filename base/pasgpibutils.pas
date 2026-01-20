@@ -35,13 +35,9 @@ Function Select(I : Integer; Const S:Array of String) : String;
 
 {$IFDEF UNIX}
 Function SigPending(SigNo:Integer) : Boolean;
+{$ENDIF}
 
 Function SelectRead(AHandle:Integer;ATimeout:Integer { in us }) : Integer;
-{$ENDIF}
-
-{$IFDEF WINDOWS}
-Function SelectRead(Sock: LongInt; TimeoutMS: Cardinal): LongInt;
-{$ENDIF}
 
 Function WaitTimeout(Initial,Period,Max:Integer;Checker:TWaitCheckerFunc;Data:Pointer) : Integer;
 
@@ -226,24 +222,8 @@ Begin
   Result := S[I];
 End;
 
-//Helper function to enable SelectRead on windows
-{$IFDEF WINDOWS}
- function SelectRead(Sock: LongInt; TimeoutMS: Cardinal): LongInt;
- var
-   FDS: TFDSet;
-   TV: TTimeVal;
- begin
-   FD_ZERO(FDS);
-   FD_SET(Sock, FDS);
-
-   TV.tv_sec  := TimeoutMS div 1000;
-   TV.tv_usec := (TimeoutMS mod 1000) * 1000;
-   // Winsock requires nfds = ignored, so pass 0
-   Result := WinSock.select(0, @FDS, nil, nil, @TV)
-  end;
-{$ENDIF}
-
 {$IFDEF UNIX}
+
 Function SigPending(SigNo:Integer) : Boolean;
 Var SigSet : TSigSet;
 Begin
@@ -252,17 +232,28 @@ Begin
   Result := (FpSigIsMember(SigSet,SigNo) <> 0);
 End;
 
+{$ENDIF}
+
 Function SelectRead(AHandle:Integer;ATimeout:Integer { in us }) : Integer;
 Var FD : TFDSet;
     T  : Timeval;
 Begin
+{$IFDEF WINDOWS}
+  FD_ZERO(FD);
+  FD_SET(AHandle, FD);
+{$ELSE}
   fpFD_ZERO(FD);
   fpFD_SET (AHandle,FD);
-  T.tv_usec := ATimeout mod 1000000;
-  T.tv_sec  := ATimeout div 1000000;
-  Result := fpSelect(AHandle+1,@FD,Nil,Nil,@T);
-End;
 {$ENDIF}
+  T.tv_usec := (ATimeout mod 1000) * 1000;
+  T.tv_sec  := ATimeout div 1000000;
+{$IFDEF WINDOWS}
+  // Winsock requires nfds = ignored, so pass 0
+  Result := WinSock.select(0,@FD,NIL,NIL,@T);
+{$ELSE}
+  Result := fpSelect(AHandle+1,@FD,Nil,Nil,@T);
+{$ENDIF}
+End;
 
 (**
  * Get file size without opening or -1 if not found
@@ -426,4 +417,3 @@ finalization
 {$ENDIF}
 
 End.
-

@@ -1,33 +1,44 @@
-#ThomaS, 130126: to use the OS and ARCH variables in MinGW we need to set
-#                them up manually first as they wont get setup automatically... 
-#$(info OS: $(OS) ARCH: $(ARCH))
+
 UNAME_S := $(shell uname -s)
-# e.g. returns "MINGW64_NT-10.0-26200"
-UNAME_LIST := $(subst _, ,$(UNAME_S))
-OS_PREFIX := $(word 1,$(UNAME_LIST))
-ifeq ($(OS_PREFIX), MINGW64)
-  export OS= Windows_NT
-  export ARCH = x86_64
+#$(info OS: $(OS) ARCH: $(ARCH))
+#$(info UNAME_S = $(UNAME_S))
+
+#find your shell and adjust your OS and ARCH accordingly
+ifeq ($(findstring MINGW,$(UNAME_S)), MINGW)
+  OS = Windows_NT
+  ARCH = x86_64
 endif
 
-#Adjust Directories
+# Define all the directories
 DIRS = base usb devcom instruments examples
 ifneq ($(OS), Windows_NT)
   DIRS += gpib
 endif
-#Furthermore, the files devcomgpib, testkeithley2010 and testrohdeschwarzfse 
-#are empty in windows. I looked into excluding these files from compilation,
-#but the amount of changes I would have to make is far greater than simply adjusting the files
 
-#Adjust Pascal-flags
+
+# Set compiler folder and compiler flags
 FPCFLAGS = ""
 ifeq ($(OS), Windows_NT)
-  FPCFLAGS += -P x86_64 -T win64 -Fu"C:/FPC/3.2.2/units/x86_64-win64"
+  FPCFLAGS += -Twin64
+  # when using 64 bit, use the cross compiler ppcrossx64.exe instead of fpc.exe
+  ifeq ($(ARCH), x86_64)
+    #path to my ppcrossx64.exe in MinG64
+    FPC = /c/FPC/3.2.2/bin/i386-win32/ppcrossx64.exe
+    FPCFLAGS += -Px86_64 -Fu"C:/FPC/3.2.2/units/x86_64-win64"
+  else
+    FPC = /c/FPC/3.2.2/bin/i386-win32/fpc.exe
+  endif
+else
+  FPC = fpc
 endif
 
 all:
-	-for dir in $(DIRS) ; do $(MAKE) -C $$dir $@ FPCFLAGS="$(FPCFLAGS)" ; done
+	@for dir in $(DIRS) ; do \
+		$(MAKE) -C $$dir $@ FPC="$(FPC)" FPCFLAGS="$(FPCFLAGS)"; \
+	done
 
 clean:
-	-for dir in $(DIRS) ; do $(MAKE) -C $$dir $@ ; done
+	@for dir in $(DIRS) ; do \
+		$(MAKE) -C $$dir clean ; \
+	done
 	rm -f *~

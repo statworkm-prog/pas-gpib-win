@@ -2,58 +2,69 @@
 #                them up manually first as they wont get setup automatically... 
 #$(info OS: $(OS) ARCH: $(ARCH))
 UNAME_S := $(shell uname -s)
-# e.g. returns "MINGW64_NT-10.0-26200"
-UNAME_LIST := $(subst _, ,$(UNAME_S))
-OS_PREFIX := $(word 1,$(UNAME_LIST))
-ifeq ($(OS_PREFIX), MINGW64)
-  export OS= Windows_NT
-  export ARCH = x86_64
+#$(info UNAME_S = $(UNAME_S))
+
+ifeq ($(findstring MINGW,$(UNAME_S)), MINGW)
+  OS = Windows_NT
+  ARCH = x86_64
 endif
 
-#fpc options
+#fpc flags
 FPC = fpc
-FPOPTS = -Fu../base -Fu../devcom -Fu../usb -Fu../pas-libusb/src -Fu../instruments -Fu../instruments/keithley -Fu../instruments/lecroy -Fu../instruments/rohdeschwarz -Fu../instruments/agilent
+FPFOPTS = -Fu../base -Fu../devcom -Fu../usb -Fu../pas-libusb/src -Fu../instruments -Fu../instruments/keithley -Fu../instruments/lecroy -Fu../instruments/rohdeschwarz -Fu../instruments/agilent
 ifeq ($(OS), Windows_NT)
-    FPC_OPTS += -Fu.. -Px86_64 -Twin64
-else 
-    FPC_OPTS += -Fu../gpib
+  FPFOPTS += -Twin64
+  # when using 64 bit, use the cross compiler ppcrossx64.exe instead of fpc.exe
+  ifeq ($(ARCH), x86_64)
+    #path to my ppcrossx64.exe in MinG64
+    FPC = /c/FPC/3.2.2/bin/i386-win32/ppcrossx64.exe
+    FPFOPTS += -Fu"C:/FPC/3.2.2/units/x86_64-win64/" -Fu.. -Px86_64
+  else
+    FPC = /c/FPC/3.2.2/bin/i386-win32/fpc.exe
+  endif
+else
+  FPC = fpc
+  FPFOPTS += -Fu../gpib
 endif
 
 #programs
-PROGS = fpgacurrentmeasurement testlecroywavejet3xx testusbtmc testagilent34410a testagilentmsox3000a agilentmsox3000a-serial serialparse agilentmsox3000a-screenshot
+PROGS = fpgacurrentmeasurement testlecroywavejet3xx testusbtmc testagilent34410a testagilentmsox3000a agilentmsox3000a-serial serialparse agilentmsox3000a-screenshot testkeysighte3631xa
 
-ifeq ($(OS), Windows_NT)
+ifneq ($(OS), Windows_NT)
     PROGS += testkeithley2010 testrohdeschwarzfse
 endif
 
 all: $(PROGS)
 
+testkeysighte3631xa: testkeysighte3631xa.pas
+	-$(FPC) $(FPFOPTS) $<
+
 fpgacurrentmeasurement: fpgacurrentmeasurement.pas
-	-$(FPC) $(FPOPTS) $<
+	-$(FPC) $(FPFOPTS) $<
 
 testkeithley2010: testkeithley2010.pas
-	-$(FPC) $(FPOPTS) $<
+	-$(FPC) $(FPFOPTS) $<
 
 testlecroywavejet3xx: testlecroywavejet3xx.pas
-	$(FPC) $(FPOPTS) $<
+	$(FPC) $(FPFOPTS) $<
 
 testrohdeschwarzfse: testrohdeschwarzfse.pas
-	-$(FPC) $(FPOPTS) $<
+	-$(FPC) $(FPFOPTS) $<
 
 testusbtmc: testusbtmc.pas
-	$(FPC) $(FPOPTS) $<
+	$(FPC) $(FPFOPTS) $<
 
 testagilent34410a: testagilent34410a.pas
-	$(FPC) $(FPOPTS) $<
+	$(FPC) $(FPFOPTS) $<
 
 testagilentmsox3000a: testagilentmsox3000a.pas
-	$(FPC) $(FPOPTS) $<
+	$(FPC) $(FPFOPTS) $<
 
 agilentmsox3000a-serial: agilentmsox3000a-serial.pas
-	$(FPC) $(FPOPTS) $<
+	$(FPC) $(FPFOPTS) $<
 
 serialparse: serialparse.lpr serialparsei2c.pas serial-i2c-lex.pas serial-i2c-parser.pas
-	$(FPC) $(FPOPTS) $<
+	$(FPC) $(FPFOPTS) $<
 
 serial-i2c-parser.pas: serial-i2c-parser.y
 	pyacc serial-i2c-parser.y
@@ -62,7 +73,7 @@ serial-i2c-lex.pas: serial-i2c-lex.l serial-i2c-parser.pas
 	plex serial-i2c-lex.l
 
 agilentmsox3000a-screenshot: agilentmsox3000a-screenshot.lpr
-	$(FPC) $(FPOPTS) $<
+	$(FPC) $(FPFOPTS) $<
 
 clean:
 	rm -f $(PROGS) *.o *.ppu *~ *.compiled *.or wj-*.png *-parser.pas *-lex.pas
