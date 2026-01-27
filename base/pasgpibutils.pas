@@ -245,7 +245,7 @@ Begin
   fpFD_ZERO(FD);
   fpFD_SET (AHandle,FD);
 {$ENDIF}
-  T.tv_usec := (ATimeout mod 1000) * 1000;
+  T.tv_usec := ATimeout mod 1000000;
   T.tv_sec  := ATimeout div 1000000;
 {$IFDEF WINDOWS}
   // Winsock requires nfds = ignored, so pass 0

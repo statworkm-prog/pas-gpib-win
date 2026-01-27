@@ -1,7 +1,5 @@
 Program TestRohdeSchwarzFSE;
 
-{$IFNDEF WINDOWS}
-
 {$mode objfpc}{$H+}
 
 Uses
@@ -12,12 +10,7 @@ Var DC    : TGPIBCommunicator;
     St    : String;
     F     : Text;
 
-{$ENDIF}
-
 Begin
-
-{$IFNDEF WINDOWS}
-
   { device communicator }
   DC := TGPIBCommunicator.Create('FSEB');
   DC.SetTimeout(5000000{us});
@@ -30,7 +23,5 @@ Begin
   Write(F,St);
   Close(F);
   WriteLn(FSEB.Date);
-
-{$ENDIF}
-
 End.
+

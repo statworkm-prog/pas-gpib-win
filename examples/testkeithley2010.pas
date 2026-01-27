@@ -1,7 +1,5 @@
 Program TestKeithley2010;
 
-{$IFNDEF WINDOWS}
-
 {$mode objfpc}{$H+}
 
 Uses
@@ -16,11 +14,8 @@ Var Handle : Integer;
     DCS   : TRS232Communicator;
     K2010 : TKeithley2010;
 
-{$ENDIF}
-
 Begin
 
-{$IFNDEF WINDOWS}
 
   DCG := TGPIBCommunicator.Create('2010');
   WriteLn(DCG.Query('*IDN?'));
@@ -108,6 +103,6 @@ WriteLn('Status = ',Status,', cnt = ',ibcnt,', cntl = ',ibcntl,' Buffer = ',Buff
   Status := ibrd(Handle,Buffer,sizeof(Buffer));
 WriteLn('Status = ',Status,', cnt = ',ibcnt,', cntl = ',ibcntl,' Buffer = ',Buffer);
 
-{$ENDIF}
 
 End.
+

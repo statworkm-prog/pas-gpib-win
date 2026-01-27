@@ -1,7 +1,5 @@
 Unit DevComGPIB;
 
-{$IFNDEF WINDOWS}
-
 {$mode objfpc}{$H+}
 
 // use interfaces without IUnknown as ancestor, so they don' have reference
@@ -33,12 +31,7 @@ Type
     Function  GetTimeout:LongInt;   // in us
   End;
 
-{$ENDIF}
-
 Implementation
-
-{$IFNDEF WINDOWS}
-
 Uses LinuxGPIB;
 
 { TGPIBCommunicator }
@@ -103,4 +96,3 @@ End;
 
 End.
 
-{$ENDIF}

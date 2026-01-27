@@ -126,7 +126,6 @@ Begin
     raise Exception.Create('Received invalid data format');
   //Dump(St[1], Length(St));
   // just use the data starting at the 11th byte
-  Result := nil;
   SetLength(Result,L);
   Move(St[11],Result[0],L);
 End;
