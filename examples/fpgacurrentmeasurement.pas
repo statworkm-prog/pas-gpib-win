@@ -211,16 +211,16 @@ Procedure TMeasureMatrixSetup.Measure;
 Var I : Integer;
 Begin
   For I := 0 to Length(FMeasurements)-1 do
-     Begin
-       Write('Starting "',FLabels[I],'": press key when ready');
+    Begin
+      Write('Starting "',FLabels[I],'": press key when ready');
 {$IFDEF WINDOWS}
-        ReadKey;
+      ReadKey;
 {$ELSE}
-        RawReadKey;
+      RawReadKey;
 {$ENDIF}
-       WriteLn;
-       FMeasurements[I].Measure;
-     End;
+      WriteLn;
+      FMeasurements[I].Measure;
+    End;
   WriteLn('Done.');
 End;
 

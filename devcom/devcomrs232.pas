@@ -61,11 +61,11 @@ Constructor TRS232Communicator.Create(ADevice: String; BitsPerSec: LongInt;ByteS
 Begin
   FHandle := SerOpen(ADevice);
   if FHandle < 0 then
-    {$IFDEF WINDOWS}
+{$IFDEF WINDOWS}
     raise Exception.Create('Cannot open serial device '+ADevice+': ' + 'Winsock error ' + IntToStr(GetLastError));
-    {$ELSE}
+{$ELSE}
     raise Exception.Create('Cannot open serial device '+ADevice+': '+StrError(FpGetErrno));
-    {$ENDIF}
+{$ENDIF}
   SerSetParams(FHandle,BitsPerSec,ByteSize,Parity,StopBits,Flags);
   FTimeout := 100000; // default to 100ms
   FNewline := ^J;

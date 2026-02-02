@@ -101,7 +101,7 @@ Begin
 {$IFDEF WINDOWS}
       raise Exception.Create('Error while reading from TCP/IP stream: ' + 'Winsock error ' + IntToStr(WSAGetLastError));
 {$ELSE}
-      raise Exception.Create('Error while reading from TCP/IP stream: ' + StrError(FpGetErrno));
+      raise Exception.Create('Error while reading from TCP/IP stream: '+StrError(FpGetErrno));
 {$ENDIF}
     SetLength(Result,Pos-1+1024);
     Len := FSocket.Read(Result[Pos],1024);
