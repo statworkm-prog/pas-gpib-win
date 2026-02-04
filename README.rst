@@ -1,7 +1,3 @@
-
-=====================================================================
-*EVERYTHING IS WiP!*
-=====================================================================
 =====================================================================
 pas-gpib -- Full measurement framework for GPIB, USB-TMC, TCP/IP, ...
 =====================================================================
@@ -17,6 +13,8 @@ class implementation is included.
 Although this is work in progress, several protocols and instrumets are fully
 supported.
 
+Furthermore, we have started to implement some of the functionalities in Windows.
+USB-TMC and TCP/IP should work properly.
 
 Design Principle
 ================
@@ -95,6 +93,32 @@ at a given TCP port. The descendant class ``TTCPLeCroyCommunicator`` adds a
 special header used by several LeCroy scopes when communicating via TCP/IP.
 Their protocol was reverse-engineered.
 
+Windows
+=======
+
+Currently GPIB hasn't been implemented in Windows! 
+Only the usage of TCP and USB has been working properly on our
+KeysightE36234A (tested using testkeysighte3631xa.pas).
+
+In order to make these functions work on Windows we have used {$IFDEF WINDOWS} 
+in the files to switch between some OS-specific Libraries and functions.
+Furthermore we have completely disabled some programs and files in the Makefiles.
+
+There are several points to keep in mind when working on windows:
+1. Pascal needs to compile for Windows in order use the correct libraries and functions
+(in wsl it compiles for linux!)
+You can adjust the compilation target using the "OS" variables in BOTH Makefiles.
+2. Compiling for i386 works also on 64 bit Systems. 
+Since 2.6.0 fpc only uses a cross compiler for 64 bit, so it is recommended to just use 
+32 bit.
+3. Several of the files and functions have been disabled as they contain GPIB functions.
+The Makefiles contain the exact folders/files which are being used in which OS.
+4. pas-libusb needs an additional libusb library
+More on that in the pas-libusb repository.
+5. Make sure you have a compatible USB driver installed.
+Windows inherently installs the eXtensible Hostcontroller Driver (xHCI) which is not
+working with libusb. Use a software/tool to install a different driver.
+(e.g. `zadig <https://zadig.akeo.ie/>`_ )
 
 Instruments
 ===========
